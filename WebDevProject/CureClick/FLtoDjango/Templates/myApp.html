@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/myApp.css' %}" />
+</head>
+
+<body>
+  <main class="main-content">
+    <div class="page-title">
+      <div class="background-circle top-right"></div>
+      <div class="background-circle bottom-left"></div>
+      <div class="title-content">
+        <h1 class="title">My Confirmed Appointments</h1>
+        <p class="subtitle">You have {{ upcoming_count }} upcoming appointments</p>
+
+        {% if reschedule_mode %}
+        <div class="reschedule-notification">
+          <div class="notification-icon">
+            <i class="ri-calendar-2-line"></i>
+          </div>
+          <p>You are currently rescheduling an appointment. Complete the booking process or 
+            <a style="text-decoration: none; color: black; font-weight: bold;"
+              href="{% url 'index' %}">Cancel Rescheduling</a>.</p>
+        </div>
+        {% endif %}
+
+        <div class="date-display">
+          <div class="calendar-icon">
+            <i class="ri-calendar-line"></i>
+          </div>
+          <span>Today is {{ today_date }}</span>
+        </div>
+
+        {% if not appointments %}
+        <div class="new-appointment-button" style="width: 240px; margin-top: 10px; padding-bottom: -10px;">
+          <a href="{% url 'book' %}" class="btn primary-btn" style="text-decoration: none;">
+            <div class="btn-icon">
+              <i class="ri-add-line"></i>
+            </div>
+            <span>Book New Appointment</span>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% for appointment in appointments %}
+    <!-- Appointment Card -->
+    <div
+      class="appointment-card {% cycle 'primary-card' 'secondary-card' 'purple-card' %} {% if appointment.is_being_rescheduled %}reschedule-in-progress{% endif %}"
+      style="margin-bottom: 20px;">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="doctor-info">
+          <div class="doctor-avatar">
+            <div class="avatar-icon">
+              <i class="ri-user-heart-line"></i>
+            </div>
+          </div>
+          <div>
+            <div class="appointment-tags">
+              <span class="tag blue-tag">{{ appointment.id }}</span>
+              <span class="tag green-tag">{{ appointment.type }}</span>
+              {% if appointment.is_being_rescheduled %}
+              <span class="tag orange-tag">Rescheduling</span>
+              {% endif %}
+            </div>
+            <h3 class="doctor-name">Dr. {{ appointment.doctor.name }}</h3>
+            <p class="doctor-specialty" style="margin-top: -10px;">{{ appointment.doctor.specialty }}</p>
+            <p class="doctor-department" style="margin-top: -15px;">{{ appointment.doctor.department }}</p>
+          </div>
+        </div>
+        <div class="appointment-date">
+          <p class="date">{{ appointment.date|date:"Y-m-d" }}</p>
+          <p class="time">{{ appointment.time }}</p>
+        </div>
+      </div>
+
+      <!-- Card Details -->
+      <div class="card-details">
+        <!-- Patient Info -->
+        <div class="info-section">
+          <div class="section-title">
+            <div class="section-icon"><i class="ri-user-line"></i></div>
+            <h4 style="font-size: 17.5px; margin-top: 8px;">Patient Information</h4>
+          </div>
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-icon"><i class="ri-user-3-line"></i></div>
+              <p>{{ appointment.patient.name }}</p>
+            </div>
+            <div class="info-item" style="margin-top: -12px;">
+              <div class="info-icon"><i class="ri-map-pin-line"></i></div>
+              <p>{% if appointment.patient.city %}{{ appointment.patient.city }}{% else %}Location not provided{% endif %}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointment Info -->
+        <div class="info-section">
+          <div class="section-title">
+            <div class="section-icon"><i class="ri-calendar-check-line"></i></div>
+            <h4 style="font-size: 17.5px; margin-top: 8px;">Appointment Details</h4>
+          </div>
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-icon"><i class="ri-stethoscope-line"></i></div>
+              <p>{{ appointment.type }}</p>
+            </div>
+            <div class="info-item" style="margin-top: -15px;">
+              <div class="info-icon"><i class="ri-hospital-line"></i></div>
+              <p>{{ appointment.location }}</p>
+            </div>
+            <div class="info-item" style="margin-top: -15px;">
+              <div class="info-icon" style="font-weight: bold;">₹</div>
+              <p style="font-weight: bold;"> {{ appointment.fees }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Actions -->
+      <div class="card-actions">
+        <div class="action-links">
+          <button class="action-link">
+            <div class="action-icon"><i class="ri-message-3-line"></i></div>
+            <span>Message</span>
+          </button>
+          <button class="action-link">
+            <div class="action-icon"><i class="ri-map-pin-line"></i></div>
+            <span>Get Directions</span>
+          </button>
+        </div>
+        <div class="action-buttons">
+          {% if appointment.is_being_rescheduled %}
+          <a href="{% url 'book' %}" class="btn primary-btn" style="text-decoration: none;">
+            <div class="btn-icon"><i class="ri-calendar-2-line"></i></div>
+            <span>Continue Rescheduling</span>
+          </a>
+          {% else %}
+          <a href="{% url 'reschedule' appointment.booking_id %}" class="btn primary-btn"
+            style="text-decoration: none;">
+            <div class="btn-icon"><i class="ri-calendar-2-line"></i></div>
+            <span>Reschedule</span>
+          </a>
+          {% endif %}
+          <button id="cancelBtn" class="btn danger-btn cancel-btn" style="text-decoration: none;">
+            <div class="btn-icon"><i class="ri-close-line"></i></div>
+            <span>Cancel</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div id="confirmationModal-{{ appointment.booking_id }}" class="modal"
+        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content"
+          style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+          <h3 style="margin-top: 0;">Cancel Appointment</h3>
+          <p>Are you sure you want to cancel this appointment?</p>
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button class="btn closeModal" data-id="{{ appointment.booking_id }}"
+              style="background-color: black; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">No,
+              Keep</button>
+            <form id="cancelForm" method="POST" style="display: inline;">
+              {% csrf_token %}
+              <input type="hidden" name="booking_id" value="{{ appointment.booking_id }}">
+              <button type="submit" name="cancel_booking" class="btn danger-btn"
+                style="background-color: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Yes,
+                Cancel</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </main>
+
+  {% endblock %}
+
+  {% block scripts %}
+  <script src="{% static 'js/myApp.js' %}"></script>
+  {% endblock %}
+</body>
+
+</html>
