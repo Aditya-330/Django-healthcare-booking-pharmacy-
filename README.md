@@ -1,3 +1,5 @@
+# Django-healthcare-booking-pharmacy-
+
 # CureClick
 
 CureClick is a comprehensive healthcare platform that combines an online pharmacy service with doctor consultation booking. The application enables users to purchase medicines, book appointments with healthcare professionals, and manage their healthcare needs in one place.
@@ -75,10 +77,22 @@ CureClick is a comprehensive healthcare platform that combines an online pharmac
 ## Project Structure
 
 - `pharmacy/`: Django app for online pharmacy functionality
-- `FLtoDjango/`: Django app for doctor consultation services
+- `FLtoDjango/`: Django app for doctor consultation services (converted from flask project with some major changes)
 - `media/`: Media files storage
 - `static/`: Static files (CSS, JS, images)
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributors
+
+- [Aditya]
+- [Dhruv Mahajan]
+- [Neelabh]
+- [Saksham Sheoron]
+
+
+## Acknowledgments
+
+- Special thanks to all contributors and users of the CureClick platform
